@@ -31,11 +31,12 @@ jobs:
             --reporter-htmlextra-export ./postman/report.html \
             --reporter-htmlextra-title "ServeRest API Tests"
 
-      - name: Upload HTML Report
-        uses: actions/upload-artifact@v3
+            - name: Upload HTML Report
+        uses: actions/upload-artifact@v4
         with:
           name: postman-report
           path: ./postman/report.html
+
 
       - name: Comment on Pull Request
         if: github.event_name == 'pull_request'
