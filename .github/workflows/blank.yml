@@ -1,0 +1,47 @@
+name: Run Postman Tests with Report
+
+on:
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  newman:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+
+      - name: Install Newman and Reporter
+        run: |
+          npm install -g newman
+          npm install -g newman-reporter-htmlextra
+
+      - name: Run Postman Collection
+        run: |
+          newman run ./postman/collection.json \
+            --reporters cli,htmlextra \
+            --reporter-htmlextra-export ./postman/report.html \
+            --reporter-htmlextra-title "ServeRest API Tests"
+
+      - name: Upload HTML Report
+        uses: actions/upload-artifact@v3
+        with:
+          name: postman-report
+          path: ./postman/report.html
+
+      - name: Comment on Pull Request
+        if: github.event_name == 'pull_request'
+        uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          header: "📝 ServeRest API Test Report"
+          message: |
+            ✅ Postman tests foram executados.
+            [Clique aqui para baixar o relatório HTML](./postman/report.html)
